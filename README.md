@@ -4,7 +4,6 @@ Using schemas to define the expected-keys and their expected type.
 
 **Still in BETA and more features will be added soon**
 
-
 ## Installation
 Installation is done using **npm install command:**
 ```> npm install express-key-validator```
@@ -69,7 +68,22 @@ Installation is done using **npm install command:**
 >  "type": "invalid_param(s)",
 >  "success": false,
 >  "invalid_params": [
->      {
+>    "firstname"
+>   ]
+> }
+```
+Response Options:
+```
+> const Response = Validator.Response
+> Response.Options({detailed: true})
+```
+Response output:
+```
+> {
+>   "type": "invalid_param(s)",
+>   "success": false,
+>   "invalid_params": [
+>     {
 >       "firstname": {
 >         "expected_type(s)": [
 >            "String"
