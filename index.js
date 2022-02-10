@@ -1,5 +1,22 @@
 const storedRules = []
 const connected_keys = []
+let response_options = []
+
+const validResponseOptions = {
+    detailed: 'detailed',
+    layout: 'layout',
+}
+
+const Response = {
+    Options: function(options) {
+        Object.entries(options).forEach(([k, v]) => {
+            if(validResponseOptions[k]) response_options.push({[k]: v})
+        })
+    },
+    GetOptions: function(){
+        return response_options
+    }
+}
 
 const Validator = {
     storedRules: [],
@@ -43,6 +60,7 @@ const Validator = {
         },
     },
     validateKeys,
+    Response,
 
 }
 
@@ -67,23 +85,28 @@ function validateKeys(req, res, next){
     if(!expected_keys) return next()
 
     const missingParams = getMissingParams(req.body, expected_keys)
-    if(!missingParams.success){
-        return res.status(400).send({
-            type: 'missing_param(s)',
-            success: false,
-            missing_params: missingParams?.missingParams
-        })
-    }
+    if(!missingParams.success) return res.status(400).send(generateError('missing_param(s)', {missing_params: missingParams.missingParams}))
 
     const invalidParams = checkInvalidParams(req.body, expected_keys)
+    if(!invalidParams.success) {
+    
+        let renderDetailed = false
 
-
-    if(!invalidParams.success){
-        return res.status(400).send({
-            type: 'invalid_param(s)',
-            success: false,
-            invalid_params: invalidParams.invalidParams
+        response_options.forEach(option => {
+            Object.entries(option).forEach(([k, v]) => {
+                if(k === 'detailed' && v) renderDetailed = true
+            })
         })
+
+        if(!renderDetailed){
+            const invalidKeys = []
+            invalidParams.invalidParams.forEach(k => {
+                Object.keys(k).forEach(key => invalidKeys.push(key))
+            })
+            return res.status(400).send(generateError('invalid_param(s)', {invalid_params: invalidKeys}))
+        }
+
+        return res.status(400).send(generateError('invalid_param(s)', {invalid_params: invalidParams.invalidParams}))
     }
 
     next()
@@ -153,6 +176,16 @@ const validateType = {
     Integer: v => isNumber(+v),
     min: (v, m) => checkMinValue(v, m),
     max: (v, m) => checkMaxValue(v, m),
+}
+
+
+
+const generateError = (type, config) => {
+    return {
+        type: type,
+        success: false,
+        ...config
+    }
 }
 
 
