@@ -38,7 +38,7 @@ const Validator = {
         },
     },
     Route:{
-        connect: function (route, schema) {
+        Connect: function (route, schema) {
             connected_keys.push({[route]: schema})
         },
     },
@@ -46,11 +46,13 @@ const Validator = {
 
 }
 
-export default Validator
+module.exports = Validator
 
 //** ----MIDDLEWARE---- */
 
 function validateKeys(req, res, next){
+
+    if (req.method !== "POST") return next()
 
     let expected_keys
     const path = req.originalUrl
@@ -154,17 +156,17 @@ const validateType = {
 }
 
 
-export const isNumber = v => typeof v === 'number' && !isNaN(v) && v
-export const isNull = v => v === null
-export const isUndefined = v => v === undefined
-export const isNullish = v => v == undefined
-export const isObject = v =>  !!v && typeof v === 'object' && !Array.isArray(v)
-export const isString = v =>  typeof v === 'string'
-export const isFunction = v =>  typeof v === 'function'
-export const isArray = v =>  Array.isArray(v)
-export const isBoolean = v => typeof v === 'boolean'
-export const isUpperCase = v => v === v.toUpperCase()
-export const isLowerCase = v => v === v.toLowerCase()
+const isNumber = v => typeof v === 'number' && !isNaN(v) && v
+const isNull = v => v === null
+const isUndefined = v => v === undefined
+const isNullish = v => v == undefined
+const isObject = v =>  !!v && typeof v === 'object' && !Array.isArray(v)
+const isString = v =>  typeof v === 'string'
+const isFunction = v =>  typeof v === 'function'
+const isArray = v =>  Array.isArray(v)
+const isBoolean = v => typeof v === 'boolean'
+const isUpperCase = v => v === v.toUpperCase()
+const isLowerCase = v => v === v.toLowerCase()
 
-export const checkMinValue = (value, minValue) => value.length >= minValue && value && minValue
-export const checkMaxValue = (value, maxValue) => value.length <= maxValue && value && maxValue
+const checkMinValue = (value, minValue) => value.length >= minValue && value && minValue
+const checkMaxValue = (value, maxValue) => value.length <= maxValue && value && maxValue
