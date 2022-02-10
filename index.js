@@ -157,16 +157,6 @@ const validateType = {
 
 
 const isNumber = v => typeof v === 'number' && !isNaN(v) && v
-const isNull = v => v === null
-const isUndefined = v => v === undefined
-const isNullish = v => v == undefined
-const isObject = v =>  !!v && typeof v === 'object' && !Array.isArray(v)
 const isString = v =>  typeof v === 'string'
-const isFunction = v =>  typeof v === 'function'
-const isArray = v =>  Array.isArray(v)
-const isBoolean = v => typeof v === 'boolean'
-const isUpperCase = v => v === v.toUpperCase()
-const isLowerCase = v => v === v.toLowerCase()
-
 const checkMinValue = (value, minValue) => value.length >= minValue && value && minValue
 const checkMaxValue = (value, maxValue) => value.length <= maxValue && value && maxValue
