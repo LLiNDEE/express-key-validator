@@ -2,6 +2,8 @@
 A simple body-key-validator for your express-app.
 Using schemas to define the expected-keys and their expected type.
 
+**Still in BETA and more features will be added soon**
+
 
 ## Installation
 Installation is done using **npm install command:**
@@ -80,3 +82,4 @@ Installation is done using **npm install command:**
 
 ## Contribution
 Pull requests are welcome. For any considerable changes, please open an issue first to discuss what you would like to change.
+NOTE: This is still in BETA so please let me know if there are any features that you think can be improved or added.
