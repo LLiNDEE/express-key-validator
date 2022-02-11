@@ -33,12 +33,20 @@ const Validator = {
             this.TempRules.push("Integer")
             return this
         },
-        min: function(val){
-            if(isNumber(val))this.TempRules.push(`min(${val})`)
+        min: function(value){
+            if(isNumber(val))this.TempRules.push(`min(${value})`)
             return this
         },
-        max: function(val){
-            if(isNumber(val)) this.TempRules.push(`max(${val})`)
+        max: function(value){
+            if(isNumber(val)) this.TempRules.push(`max(${value})`)
+            return this
+        },
+        enum: function(values){
+            if(isArray(values)) this.TempRules.push(`enum(${values})`)
+            return this
+        },
+        isEmail: function(){
+            this.TempRules.push("Email")
             return this
         },
         exec: function () {
@@ -144,7 +152,8 @@ const checkInvalidParams = (incomingKeys, expectedKeys) => {
                 const value = ruleArr[1].split(")")[0];
                 if(!validateType[ruleArr[0]](incomingKeys[k], value) && !isDublicate){
                     isValid = false
-                    return invalidParams.push({[k]: {'expected_type(s)': `${(ruleArr[0] === 'min') ? `Minimum length of ${value}` : `Maximum length of ${value}`}`}})
+                    // return invalidParams.push({[k]: {'expected_type(s)': `${(ruleArr[0] === 'min') ? `Minimum length of ${value}` : `Maximum length of ${value}`}`}})
+                    return invalidParams.push({[k]: {'expected_type(s)': resolveInvalidMessage(ruleArr[0], value)}})
                 }
                 return
             }
@@ -171,14 +180,20 @@ const checkInvalidParams = (incomingKeys, expectedKeys) => {
 
 }
 
+const resolveInvalidMessage = (type, value) =>
+type === 'min' ? `Minimum length of ${value}`
+: type === 'max' ? `Maximum length of ${value}`
+: type === 'enum' ? `Allowed values: ${value}`
+: ""
+
 const validateType = {
     String: v => isString(v) && v.trim() !== "",
     Integer: v => isNumber(+v),
     min: (v, m) => checkMinValue(v, m),
     max: (v, m) => checkMaxValue(v, m),
+    enum: (v, enums) => checkEnum(v, enums),
+    Email: email => checkEmail(email),
 }
-
-
 
 const generateError = (type, config) => {
     return {
@@ -188,8 +203,12 @@ const generateError = (type, config) => {
     }
 }
 
-
 const isNumber = v => typeof v === 'number' && !isNaN(v) && v
 const isString = v =>  typeof v === 'string'
+const isArray = v =>  Array.isArray(v)
 const checkMinValue = (value, minValue) => value.length >= minValue && value && minValue
 const checkMaxValue = (value, maxValue) => value.length <= maxValue && value && maxValue
+const checkEnum = (value, enums) => enums.includes(value)
+const checkEmail = email => email && email.includes("@") && email.includes('.') && email.length > 3 && email.match(regExpEmail)
+
+const regExpEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/
