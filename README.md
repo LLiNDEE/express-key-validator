@@ -42,12 +42,15 @@ Installation is done using **npm install command:**
 > Schema.isInteger() - Checks if the value is of type 'number'
 > Schema.min(3) - Defines the minimum length of the value
 > Schema.max(10) - Defines the maximum length of the value
+> Schema.isEmail() - Checks if the value is a valid email-address
+> Schema.enum([]) - Defines a set of allowed values
 > Schema.exec() - Defines the end of the validation rules
 ```
 #### Example
 ```
 > const UserSchema = new Schema.Create({
->    firstname: Schema.isString().min(3).exec() 
+>    firstname: Schema.isString().min(3).exec(),
+>    email: Schema.isString().isEmail().exec()
 > })
 ```
 
