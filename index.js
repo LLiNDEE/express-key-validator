@@ -34,11 +34,11 @@ const Validator = {
             return this
         },
         min: function(value){
-            if(isNumber(val))this.TempRules.push(`min(${value})`)
+            if(isNumber(value))this.TempRules.push(`min(${value})`)
             return this
         },
         max: function(value){
-            if(isNumber(val)) this.TempRules.push(`max(${value})`)
+            if(isNumber(value)) this.TempRules.push(`max(${value})`)
             return this
         },
         enum: function(values){
