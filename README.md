@@ -9,7 +9,7 @@ Installation is done using **npm install command:**
 ```> npm install express-key-validator```
 
 ## Usage
-```
+```js
 > const express = require('express')
 > const Validator = require('express-key-validator')
 >
@@ -37,7 +37,7 @@ Installation is done using **npm install command:**
 > })
 ```
 ### Validation options
-```
+```js
 > Schema.isString() - Checks if the value is of type 'string'
 > Schema.isInteger() - Checks if the value is of type 'number'
 > Schema.min(3) - Defines the minimum length of the value
@@ -47,7 +47,7 @@ Installation is done using **npm install command:**
 > Schema.exec() - Defines the end of the validation rules
 ```
 #### Example
-```
+```js
 > const UserSchema = new Schema.Create({
 >    firstname: Schema.isString().min(3).exec(),
 >    email: Schema.isString().isEmail().exec()
@@ -56,7 +56,7 @@ Installation is done using **npm install command:**
 
 ## Response types
 **Missing params**
-```
+```yaml
 > {
 >   "type": "missing_param(s)",
 >   "success": false,
@@ -66,7 +66,7 @@ Installation is done using **npm install command:**
 > }
 ```
 **Invalid params**
-```
+```yaml
 > {
 >  "type": "invalid_param(s)",
 >  "success": false,
@@ -76,12 +76,12 @@ Installation is done using **npm install command:**
 > }
 ```
 Response Options:
-```
+```js
 > const Response = Validator.Response
 > Response.Options({detailed: true})
 ```
 Response output:
-```
+```yaml
 > {
 >   "type": "invalid_param(s)",
 >   "success": false,
