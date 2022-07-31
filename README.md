@@ -58,7 +58,6 @@ Installation is done using **npm install command:**
 > const UserSchema = new Validator().Schema().Create({
 >    firstname: new Validator().string().min(3),
 >    email: new Validator().string().email()
-> })
 ```
 
 ## Options
@@ -116,6 +115,7 @@ Response Options:
 > const Response = Validator.Response
 > Response.Options({detailed: true})
 ```
+
 Response output:
 ```yaml
 > {
