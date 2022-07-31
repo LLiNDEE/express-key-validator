@@ -19,14 +19,14 @@ Installation is done using **npm install command:**
 >
 > app.use(Validator.validateKeys)
 >
-> const Schema = Validator.Schema
+> 
 > const Connect = Validator.Route.Connect
 >
-> const UserSchema = new Schema.Create({
->    firstname: Schema.isString().exec(),
->    username: Schema.isString().max(16).exec(),
->    password: Schema.isString().min(6).exec(),
->    age: Schema.isInteger().exec(),
+> const UserSchema = new Validator().Schema().Create({
+>    firstname: new Validator().string().min(3),
+>    username: new Validator().string().required(),
+>    password: new Validator().string().min(15).required(),
+>    age: new Validator().integer().positive(),
 > })
 >
 > Connect("/user", UserSchema)
@@ -38,21 +38,43 @@ Installation is done using **npm install command:**
 ```
 ### Validation options
 ```js
-> Schema.isString() - Checks if the value is of type 'string'
-> Schema.isInteger() - Checks if the value is of type 'number'
-> Schema.min(3) - Defines the minimum length of the value
-> Schema.max(10) - Defines the maximum length of the value
-> Schema.isEmail() - Checks if the value is a valid email-address
-> Schema.enum([]) - Defines a set of allowed values
-> Schema.exec() - Defines the end of the validation rules
+> string() - Checks if the value is of type 'string'
+> integer() - Checks if the value is of type 'number'
+> min(3) - Defines the minimum length of the value
+> max(10) - Defines the maximum length of the value
+> email() - Checks if the value is a valid email-address
+> email({regex: *custom regex*}) - Makes it possible to use your own regex for email validation instead of using the default one
+> enum([]) - Defines a set of allowed values
+> lowercase() - Transform the value to lowercase
+> uppercase() - Transform the value to uppercase
+> trim() - Trims the value
+> default("") - If the received value is undefined, it will use the value passed to the default function. 
+> positive() - Checks if the value is a positive number
+> negative() - Checks if the value is negative number
+> required() - Defines that the param is required and will throw error if the param is not found
 ```
 #### Example
 ```js
-> const UserSchema = new Schema.Create({
->    firstname: Schema.isString().min(3).exec(),
->    email: Schema.isString().isEmail().exec()
-> })
+> const UserSchema = new Validator().Schema().Create({
+>    firstname: new Validator().string().min(3),
+>    email: new Validator().string().email()
 ```
+
+## Options
+Alternative options that can be used.
+### StrictMode
+```js
+const Validator = require('express-key-validator')
+new Validator().useStrictMode(true)
+```
+Setting strictMode to true means that every single param defined in the schema is automatically required. There is no need to use required() when using strictMode.
+
+### SecureMode
+```js
+const Validator = require('express-key-validator')
+new Validator().useSecureMode(true)
+```
+Setting secureMode to true means that it will ONLY allow params defined in the schema.
 
 ## Response types
 **Missing params**
@@ -75,11 +97,25 @@ Installation is done using **npm install command:**
 >   ]
 > }
 ```
+
+**Unknown params**
+<br> NOTE: This only applies when secureMode is set to true.
+```yaml
+> {
+>  "type": "unknown_param(s)",
+>  "success": false,
+>  "unknown_params": [
+>    "asdasd"
+>   ]
+> }
+```
+
 Response Options:
 ```js
 > const Response = Validator.Response
 > Response.Options({detailed: true})
 ```
+
 Response output:
 ```yaml
 > {
