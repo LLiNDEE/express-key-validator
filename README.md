@@ -2,8 +2,6 @@
 A simple body-key-validator for your express-app.
 Using schemas to define the expected-keys and their expected type.
 
-**Still in BETA and more features will be added soon**
-
 ## Installation
 Installation is done using **npm install command:**
 ```> npm install express-key-validator```
@@ -52,12 +50,14 @@ Installation is done using **npm install command:**
 > positive() - Checks if the value is a positive number
 > negative() - Checks if the value is negative number
 > required() - Defines that the param is required and will throw error if the param is not found
+> regex( *regex* ) - Checks if the value matches the passed regex-expression
 ```
 #### Example
 ```js
 > const UserSchema = new Validator().Schema().Create({
 >    firstname: new Validator().string().min(3),
 >    email: new Validator().string().email()
+> })
 ```
 
 ## Options
