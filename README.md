@@ -79,58 +79,58 @@ Setting secureMode to true means that it will ONLY allow params defined in the s
 ## Response types
 **Missing params**
 ```yaml
-> {
->   "type": "missing_param(s)",
->   "success": false,
->   "missing_params": [
->      "firstname"
->    ]
-> }
+{
+  "type": "missing_param(s)",
+  "success": false,
+  "missing_params": [
+    "firstname"
+   ]
+}
 ```
 **Invalid params**
 ```yaml
-> {
->  "type": "invalid_param(s)",
->  "success": false,
->  "invalid_params": [
->    "firstname"
->   ]
-> }
+{
+  "type": "invalid_param(s)",
+  "success": false,
+  "invalid_params": [
+    "firstname"
+   ]
+}
 ```
 
 **Unknown params**
 <br> NOTE: This only applies when secureMode is set to true.
 ```yaml
-> {
->  "type": "unknown_param(s)",
->  "success": false,
->  "unknown_params": [
->    "asdasd"
->   ]
-> }
+{
+  "type": "unknown_param(s)",
+  "success": false,
+  "unknown_params": [
+    "asdasd"
+   ]
+}
 ```
 
 Response Options:
 ```js
-> const Response = Validator.Response
-> Response.Options({detailed: true})
+const Response = Validator.Response
+Response.Options({detailed: true})
 ```
 
 Response output:
 ```yaml
-> {
->   "type": "invalid_param(s)",
->   "success": false,
->   "invalid_params": [
->     {
->       "firstname": {
->         "expected_type(s)": [
->            "String"
->          ]
->        }
->      },
->   ]
-> }
+{
+   "type": "invalid_param(s)",
+   "success": false,
+   "invalid_params": [
+     {
+       "firstname": {
+         "expected_type(s)": [
+            "String"
+          ]
+        }
+      },
+   ]
+}
 ```
 
 ## Custom response templates
