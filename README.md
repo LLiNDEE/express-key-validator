@@ -136,14 +136,18 @@ Response output:
 ## Custom response templates
 This is an option that allows you to use your own custom template for the different responses.
 
-### Enable custom templates
+#### How to enable custom templates:
 ```js
 const Validator = require('express-key-validator')
 new Validator().useCustomTemplate()
 ```
 
-Create a file named > validator.config.yml
+Create a file named > validator.config.yml,
 In this file you can define the templates used for the different responses.
+
+Valid templates are: missing_params, invalid_params and unknown_params.
+
+Inside *validator.config.yml*
 ```yaml
 missing_params:
     template: {
@@ -160,7 +164,7 @@ missing_params:
     CUSTOM: 'CUSTOM'
 }
 ```
-- *** $params$ *** defines where the actual params will go in your template. This is totally optional, you can create a template without *** $params$ ***.
+- $params$ defines where the actual params will go in your template. This is totally optional, you can create a template without $params$.
 
 
 ## Contribution
