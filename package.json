@@ -1,13 +1,19 @@
 {
   "name": "express-key-validator",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "description": "A simple body-key-validator for your express-app.",
   "main": "index.js",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["express", "validator", "express-validator", "key-validator", "schema"],
+  "keywords": [
+    "express",
+    "validator",
+    "express-validator",
+    "key-validator",
+    "schema"
+  ],
   "author": "",
   "repository": {
     "type": "git",
@@ -16,5 +22,8 @@
   "bugs": {
     "url": "https://github.com/LLiNDEE/express-key-validator/issues"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "js-yaml": "^4.1.0"
+  }
 }

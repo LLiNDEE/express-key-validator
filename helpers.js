@@ -1,4 +1,9 @@
+import fs from 'fs';
+import yaml from 'js-yaml';
 import { strictMode } from "./index.js"
+
+const validTemplates = ["missing_params", "invalid_params", "unknown_params"];
+export const customTemplates = {};
 
 export const getMissingParams = (incomingKeys, expectedKeys) => {
 
@@ -178,6 +183,34 @@ export const transformType = {
     lowercase: v => v.toLowerCase(),
     uppercase: v => v.toUpperCase(),
     trim: v => v.trim(),
+}
+
+export const readConfig = () => {
+    try{
+        const fileContents = fs.readFileSync('validator.config.yml', 'utf8');
+        const data = yaml.load(fileContents);
+
+        if(!data || data === undefined) return;
+        setCustomTemplate(data);
+    } catch(e) {
+        return false;
+    }
+}
+
+const setCustomTemplate = data => {
+    Object.entries(data).forEach(([k, v]) => {
+        if(!validTemplates.includes(k)) return;
+        customTemplates[k] = v?.template;
+    })
+}
+
+export const generateCustomTemplate = (template, data = []) => {
+    let stringTemplate = JSON.stringify(template);
+    console.log(data);
+    if(stringTemplate.includes("$params$")){
+        stringTemplate = stringTemplate.replace("$params$", data);
+    }
+    return JSON.parse(stringTemplate);
 }
 
 const isNumber = v => typeof v === 'number' && !isNaN(v) && v
