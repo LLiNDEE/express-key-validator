@@ -133,6 +133,36 @@ Response output:
 > }
 ```
 
+## Custom response templates
+This is an option that allows you to use your own custom template for the different responses.
+
+### Enable custom templates
+```js
+const Validator = require('express-key-validator')
+new Validator().useCustomTemplate()
+```
+
+Create a file named > validator.config.yml
+In this file you can define the templates used for the different responses.
+```yaml
+missing_params:
+    template: {
+        success: false,
+        missingPARAMS: $params$,
+        CUSTOM: 'CUSTOM'
+    }
+```
+#### Output:
+```yaml
+{
+    success: false,
+    missingPARAMS: ["firstname"],
+    CUSTOM: 'CUSTOM'
+}
+```
+- *** $params$ *** defines where the actual params will go in your template. This is totally optional, you can create a template without *** $params$ ***.
+
+
 ## Contribution
 Pull requests are welcome. For any considerable changes, please open an issue first to discuss what you would like to change.
 NOTE: This is still in BETA so please let me know if there are any features that you think can be improved or added.
