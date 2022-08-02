@@ -132,6 +132,9 @@ function validateKeys(req, res, next){
         let mp = missingParams.missingParams;
         mp.forEach(param => {
             const paramRules = expected_keys[param].rules;
+            paramRules.forEach(rule => {
+                if(rule.rule === 'required') requiredParams.push(param);
+            })
             if(paramRules.includes('required')) requiredParams.push(param);
         })
 

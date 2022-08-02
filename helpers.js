@@ -77,6 +77,8 @@ export const checkInvalidParams = (incomingKeys, expectedKeys) => {
                     return;
                 }
 
+                if(ruleObject.rule === 'required') return;
+                
                 if(ruleObject?.value){
                     if(!validateType[ruleObject.rule](incomingValue, ruleObject.value)){
                         if(exist) return;
