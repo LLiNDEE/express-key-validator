@@ -79,71 +79,75 @@ Setting secureMode to true means that it will ONLY allow params defined in the s
 ## Response types
 **Missing params**
 ```yaml
-> {
->   "type": "missing_param(s)",
->   "success": false,
->   "missing_params": [
->      "firstname"
->    ]
-> }
+{
+  "type": "missing_param(s)",
+  "success": false,
+  "missing_params": [
+    "firstname"
+   ]
+}
 ```
 **Invalid params**
 ```yaml
-> {
->  "type": "invalid_param(s)",
->  "success": false,
->  "invalid_params": [
->    "firstname"
->   ]
-> }
+{
+  "type": "invalid_param(s)",
+  "success": false,
+  "invalid_params": [
+    "firstname"
+   ]
+}
 ```
 
 **Unknown params**
 <br> NOTE: This only applies when secureMode is set to true.
 ```yaml
-> {
->  "type": "unknown_param(s)",
->  "success": false,
->  "unknown_params": [
->    "asdasd"
->   ]
-> }
+{
+  "type": "unknown_param(s)",
+  "success": false,
+  "unknown_params": [
+    "asdasd"
+   ]
+}
 ```
 
 Response Options:
 ```js
-> const Response = Validator.Response
-> Response.Options({detailed: true})
+const Response = Validator.Response
+Response.Options({detailed: true})
 ```
 
 Response output:
 ```yaml
-> {
->   "type": "invalid_param(s)",
->   "success": false,
->   "invalid_params": [
->     {
->       "firstname": {
->         "expected_type(s)": [
->            "String"
->          ]
->        }
->      },
->   ]
-> }
+{
+   "type": "invalid_param(s)",
+   "success": false,
+   "invalid_params": [
+     {
+       "firstname": {
+         "expected_type(s)": [
+            "String"
+          ]
+        }
+      },
+   ]
+}
 ```
 
 ## Custom response templates
 This is an option that allows you to use your own custom template for the different responses.
 
-### Enable custom templates
+#### How to enable custom templates:
 ```js
 const Validator = require('express-key-validator')
 new Validator().useCustomTemplate()
 ```
 
-Create a file named > validator.config.yml
+Create a file named > validator.config.yml,
 In this file you can define the templates used for the different responses.
+
+Valid templates are: missing_params, invalid_params and unknown_params.
+
+Inside *validator.config.yml*
 ```yaml
 missing_params:
     template: {
@@ -160,7 +164,7 @@ missing_params:
     CUSTOM: 'CUSTOM'
 }
 ```
-- *** $params$ *** defines where the actual params will go in your template. This is totally optional, you can create a template without *** $params$ ***.
+- $params$ defines where the actual params will go in your template. This is totally optional, you can create a template without $params$.
 
 
 ## Contribution
