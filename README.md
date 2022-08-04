@@ -145,6 +145,15 @@ new Validator().useCustomTemplate()
 Create a file named > validator.config.yml,
 In this file you can define the templates used for the different responses.
 
+You can name the config file whatever you want. But the file has to be a yaml-file.
+
+*If you use something other than 'validator.config.yml'*
+#### How to use a config-file named something else:
+```js
+const Validator = require('express-key-validator')
+new Validator().useCustomTemplate('customName.CanBeAnything.yml')
+```
+
 Valid templates are: missing_params, invalid_params and unknown_params.
 
 Inside *validator.config.yml*
