@@ -1,8 +1,12 @@
 import {
 	checkInvalidParams,
+	CONFIG_PATH,
+	customTemplates,
+	generateCustomTemplate,
 	generateError,
 	getMissingParams,
 	getUnknownParams,
+	readConfig,
 } from './helpers.js';
 
 const connected_keys = [];
@@ -22,6 +26,13 @@ const Response = {
 	},
 	GetOptions: function () {
 		return response_options;
+	},
+};
+
+const options = {
+	useCustomTemplate: function (configPath = undefined) {
+		if (typeof configPath !== 'undefined') CONFIG_PATH = configPath;
+		readConfig();
 	},
 };
 
@@ -109,6 +120,7 @@ class Validator {
 	}
 	validateKeys = validateKeys;
 	Response = Response;
+	Options = options;
 }
 
 export default Validator;
@@ -130,6 +142,16 @@ function validateKeys(req, res, next) {
 	if (secureMode) {
 		const unknownParams = getUnknownParams(req.body, expected_keys);
 		if (!unknownParams.success) {
+
+			if (customTemplates?.unknown_params)
+				return res
+					.status(400)
+					.send(
+						generateCustomTemplate(
+							customTemplates.missing_params,
+							unknownParams.unknownParams
+						)
+					);
 			return res.status(400).send(
 				generateError('unknown_param(s)', {
 					unknown_params: unknownParams.unknownParams,
@@ -140,6 +162,13 @@ function validateKeys(req, res, next) {
 
 	const missingParams = getMissingParams(req.body, expected_keys);
 	if (!missingParams.success) {
+		let useTemplate = false;
+
+		if (customTemplates?.missing_params)
+			useTemplate = generateCustomTemplate(
+				customTemplates.missing_params,
+				missingParams.missingParams
+			);
 		const requiredParams = [];
 		let mp = missingParams.missingParams;
 		mp.forEach((param) => {
@@ -151,6 +180,7 @@ function validateKeys(req, res, next) {
 		});
 
 		if (strictMode) {
+			if (useTemplate) return res.status(400).send(useTemplate);
 			return res.status(400).send(
 				generateError('missing_param(s)', {
 					missing_params: missingParams.missingParams,
@@ -158,16 +188,19 @@ function validateKeys(req, res, next) {
 			);
 		}
 		if (requiredParams.length > 0)
-			return res
-				.status(400)
-				.send(
-					generateError('missing_param(s)', { missing_params: requiredParams })
-				);
+			return useTemplate
+				? res.status(400).send(useTemplate)
+				: res.status(400).send(
+						generateError('missing_param(s)', {
+							missing_params: requiredParams,
+						})
+				  );
 	}
 
 	const invalidParams = checkInvalidParams(req.body, expected_keys);
 	if (!invalidParams.success) {
 		let renderDetailed = false;
+		let useTemplate = false;
 
 		response_options.forEach((option) => {
 			Object.entries(option).forEach(([k, v]) => {
@@ -175,11 +208,21 @@ function validateKeys(req, res, next) {
 			});
 		});
 
+		if (customTemplates?.invalid_params) useTemplate = true;
+
 		if (!renderDetailed) {
 			const invalidKeys = [];
 			invalidParams.invalidParams.forEach((k) => {
 				Object.keys(k).forEach((key) => invalidKeys.push(key));
 			});
+
+			if (useTemplate)
+				return res
+					.status(400)
+					.send(
+						generateCustomTemplate(customTemplates.invalid_params, invalidKeys)
+					);
+
 			return res
 				.status(400)
 				.send(
@@ -187,11 +230,20 @@ function validateKeys(req, res, next) {
 				);
 		}
 
-		return res.status(400).send(
-			generateError('invalid_param(s)', {
-				invalid_params: invalidParams.invalidParams,
-			})
-		);
+		return useTemplate && !renderDetailed
+			? res
+					.status(400)
+					.send(
+						generateCustomTemplate(
+							customTemplates.invalid_params,
+							invalidParams.invalidParams
+						)
+					)
+			: res.status(400).send(
+					generateError('invalid_param(s)', {
+						invalid_params: invalidParams.invalidParams,
+					})
+			  );
 	}
 
 	req.body = invalidParams?.transformed_keys;

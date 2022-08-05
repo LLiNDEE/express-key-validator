@@ -79,59 +79,102 @@ Setting secureMode to true means that it will ONLY allow params defined in the s
 ## Response types
 **Missing params**
 ```yaml
-> {
->   "type": "missing_param(s)",
->   "success": false,
->   "missing_params": [
->      "firstname"
->    ]
-> }
+{
+  "type": "missing_param(s)",
+  "success": false,
+  "missing_params": [
+    "firstname"
+   ]
+}
 ```
 **Invalid params**
 ```yaml
-> {
->  "type": "invalid_param(s)",
->  "success": false,
->  "invalid_params": [
->    "firstname"
->   ]
-> }
+{
+  "type": "invalid_param(s)",
+  "success": false,
+  "invalid_params": [
+    "firstname"
+   ]
+}
 ```
 
 **Unknown params**
 <br> NOTE: This only applies when secureMode is set to true.
 ```yaml
-> {
->  "type": "unknown_param(s)",
->  "success": false,
->  "unknown_params": [
->    "asdasd"
->   ]
-> }
+{
+  "type": "unknown_param(s)",
+  "success": false,
+  "unknown_params": [
+    "asdasd"
+   ]
+}
 ```
 
 Response Options:
 ```js
-> const Response = Validator.Response
-> Response.Options({detailed: true})
+const Response = Validator.Response
+Response.Options({detailed: true})
 ```
 
 Response output:
 ```yaml
-> {
->   "type": "invalid_param(s)",
->   "success": false,
->   "invalid_params": [
->     {
->       "firstname": {
->         "expected_type(s)": [
->            "String"
->          ]
->        }
->      },
->   ]
-> }
+{
+   "type": "invalid_param(s)",
+   "success": false,
+   "invalid_params": [
+     {
+       "firstname": {
+         "expected_type(s)": [
+            "String"
+          ]
+        }
+      },
+   ]
+}
 ```
+
+## Custom response templates
+This is an option that allows you to use your own custom template for the different responses.
+
+#### How to enable custom templates:
+```js
+const Validator = require('express-key-validator')
+new Validator().useCustomTemplate()
+```
+
+Create a file named > validator.config.yml,
+In this file you can define the templates used for the different responses.
+
+You can name the config file whatever you want. But the file has to be a yaml-file.
+
+*If you use something other than 'validator.config.yml'*
+#### How to use a config-file named something else:
+```js
+const Validator = require('express-key-validator')
+new Validator().useCustomTemplate('customName.CanBeAnything.yml')
+```
+
+Valid templates are: missing_params, invalid_params and unknown_params.
+
+Inside *validator.config.yml*
+```yaml
+missing_params:
+    template: {
+        success: false,
+        missingPARAMS: $params$,
+        CUSTOM: 'CUSTOM'
+    }
+```
+#### Output:
+```yaml
+{
+    success: false,
+    missingPARAMS: ["firstname"],
+    CUSTOM: 'CUSTOM'
+}
+```
+- $params$ defines where the actual params will go in your template. This is totally optional, you can create a template without $params$.
+
 
 ## Contribution
 Pull requests are welcome. For any considerable changes, please open an issue first to discuss what you would like to change.
