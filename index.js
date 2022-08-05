@@ -1,172 +1,199 @@
-import { getMissingParams, checkInvalidParams, generateError, getUnknownParams} from "./helpers.js";
+import {
+	checkInvalidParams,
+	generateError,
+	getMissingParams,
+	getUnknownParams,
+} from './helpers.js';
 
 const connected_keys = [];
-const response_options = []
+const response_options = [];
 export let strictMode = false;
 let secureMode = false;
 
 const validResponseOptions = {
-    detailed: 'detailed',
-}
+	detailed: 'detailed',
+};
 
 const Response = {
-    Options: function(options) {
-        Object.entries(options).forEach(([k, v]) => {
-            if(validResponseOptions[k]) response_options.push({[k]: v})
-        })
-    },
-    GetOptions: function(){
-        return response_options
-    }
-}
+	Options: function (options) {
+		Object.entries(options).forEach(([k, v]) => {
+			if (validResponseOptions[k]) response_options.push({ [k]: v });
+		});
+	},
+	GetOptions: function () {
+		return response_options;
+	},
+};
 
 class Validator {
-    rules = [];
-    string(){
-        this.rules.push({rule: 'string'});
-        return this;
-    }
-    integer(){
-        this.rules.push({rule: 'integer'});
-        return this;
-    }
-    min(minValue){
-        this.rules.push({rule: 'min', value: minValue});
-        return this;
-    }
-    max(maxValue){
-        this.rules.push({rule: 'max', value: maxValue});
-        return this;
-    }
-    enum(args){
-        this.rules.push({rule: 'enum', value: args});
-        return this;
-    }
-    email(object){
-        this.rules.push({rule: 'email', ...object});
-        return this;
-    }
-    positive(){
-        this.rules.push({rule: 'positive'});
-        return this;
-    }
-    negative(){
-        this.rules.push({rule: 'negative'});
-        return this;
-    }
-    required(){
-        this.rules.push({rule: 'required'});
-        return this;
-    }
-    lowercase(){
-        this.rules.push({rule: 'lowercase'});
-        return this;
-    }
-    uppercase(){
-        this.rules.push({rule: 'uppercase'});
-        return this;
-    }
-    trim(){
-        this.rules.push({rule: 'trim'});
-        return this;
-    }
-    default(value){
-        this.rules.push({rule: 'default', value: value});
-        return this;
-    }
-    regex(value){
-        this.rules.push({rule: 'regex', value: value})
-        return this;
-    }
-    Route = {
-        Connect: function(route, schema){
-            connected_keys.push({[route]: schema});
-        }
-    }
-    Schema(){
-        return {
-            Create: function(schema){
-                return schema;
-            }
-        };
-    }
-    useStrictMode(value){
-        strictMode = !!value;
-        return this;
-    }
-    useSecureMode(value){
-        secureMode = !!value;
-        return this;
-    }
-    validateKeys = validateKeys;
-    Response = Response;
+	rules = [];
+	string() {
+		this.rules.push({ rule: 'string' });
+		return this;
+	}
+	integer() {
+		this.rules.push({ rule: 'integer' });
+		return this;
+	}
+	min(minValue) {
+		this.rules.push({ rule: 'min', value: minValue });
+		return this;
+	}
+	max(maxValue) {
+		this.rules.push({ rule: 'max', value: maxValue });
+		return this;
+	}
+	enum(args) {
+		this.rules.push({ rule: 'enum', value: args });
+		return this;
+	}
+	email(object) {
+		this.rules.push({ rule: 'email', ...object });
+		return this;
+	}
+	positive() {
+		this.rules.push({ rule: 'positive' });
+		return this;
+	}
+	negative() {
+		this.rules.push({ rule: 'negative' });
+		return this;
+	}
+	required() {
+		this.rules.push({ rule: 'required' });
+		return this;
+	}
+	lowercase() {
+		this.rules.push({ rule: 'lowercase' });
+		return this;
+	}
+	uppercase() {
+		this.rules.push({ rule: 'uppercase' });
+		return this;
+	}
+	trim() {
+		this.rules.push({ rule: 'trim' });
+		return this;
+	}
+	default(value) {
+		this.rules.push({ rule: 'default', value: value });
+		return this;
+	}
+	regex(value) {
+		this.rules.push({ rule: 'regex', value: value });
+		return this;
+	}
+	custom(callback) {
+		this.rules.push({ rule: callback });
+		return this;
+	}
+	Route = {
+		Connect: function (route, schema) {
+			connected_keys.push({ [route]: schema });
+		},
+	};
+	Schema() {
+		return {
+			Create: function (schema) {
+				return schema;
+			},
+		};
+	}
+	useStrictMode(value) {
+		strictMode = !!value;
+		return this;
+	}
+	useSecureMode(value) {
+		secureMode = !!value;
+		return this;
+	}
+	validateKeys = validateKeys;
+	Response = Response;
 }
 
-export default Validator
+export default Validator;
 
-function validateKeys(req, res, next){
+function validateKeys(req, res, next) {
+	let expected_keys;
+	const keys = connected_keys;
 
-    let expected_keys
-    const keys = connected_keys
+	const path = req.originalUrl;
 
-    const path = req.originalUrl
+	Object.entries(keys).forEach(([k, schema]) => {
+		Object.entries(schema).forEach(([route, v]) => {
+			if (route === path) expected_keys = v;
+		});
+	});
 
-    Object.entries(keys).forEach(([k, schema]) => {
-        Object.entries(schema).forEach(([route, v]) => {
-            if(route === path) expected_keys = v
-        })
-    })
+	if (!expected_keys) return next();
 
-    if(!expected_keys) return next();
+	if (secureMode) {
+		const unknownParams = getUnknownParams(req.body, expected_keys);
+		if (!unknownParams.success) {
+			return res.status(400).send(
+				generateError('unknown_param(s)', {
+					unknown_params: unknownParams.unknownParams,
+				})
+			);
+		}
+	}
 
-    if(secureMode){
-        const unknownParams = getUnknownParams(req.body, expected_keys);
-        if(!unknownParams.success){
-            return res.status(400).send(generateError('unknown_param(s)', {unknown_params: unknownParams.unknownParams}));
-        }
-    }
+	const missingParams = getMissingParams(req.body, expected_keys);
+	if (!missingParams.success) {
+		const requiredParams = [];
+		let mp = missingParams.missingParams;
+		mp.forEach((param) => {
+			const paramRules = expected_keys[param].rules;
+			paramRules.forEach((rule) => {
+				if (rule.rule === 'required') requiredParams.push(param);
+			});
+			if (paramRules.includes('required')) requiredParams.push(param);
+		});
 
-    const missingParams = getMissingParams(req.body, expected_keys)
-    if(!missingParams.success){
-        const requiredParams = [];
-        let mp = missingParams.missingParams;
-        mp.forEach(param => {
-            const paramRules = expected_keys[param].rules;
-            paramRules.forEach(rule => {
-                if(rule.rule === 'required') requiredParams.push(param);
-            })
-            if(paramRules.includes('required')) requiredParams.push(param);
-        })
+		if (strictMode) {
+			return res.status(400).send(
+				generateError('missing_param(s)', {
+					missing_params: missingParams.missingParams,
+				})
+			);
+		}
+		if (requiredParams.length > 0)
+			return res
+				.status(400)
+				.send(
+					generateError('missing_param(s)', { missing_params: requiredParams })
+				);
+	}
 
-        if(strictMode){
-            return res.status(400).send(generateError('missing_param(s)', {missing_params: missingParams.missingParams}));
-        }
-        if(requiredParams.length > 0) return res.status(400).send(generateError('missing_param(s)', {missing_params: requiredParams}));
-    }
+	const invalidParams = checkInvalidParams(req.body, expected_keys);
+	if (!invalidParams.success) {
+		let renderDetailed = false;
 
-    const invalidParams = checkInvalidParams(req.body, expected_keys)
-    if(!invalidParams.success) {
+		response_options.forEach((option) => {
+			Object.entries(option).forEach(([k, v]) => {
+				if (k === 'detailed' && v) renderDetailed = true;
+			});
+		});
 
-        let renderDetailed = false
+		if (!renderDetailed) {
+			const invalidKeys = [];
+			invalidParams.invalidParams.forEach((k) => {
+				Object.keys(k).forEach((key) => invalidKeys.push(key));
+			});
+			return res
+				.status(400)
+				.send(
+					generateError('invalid_param(s)', { invalid_params: invalidKeys })
+				);
+		}
 
-        response_options.forEach(option => {
-            Object.entries(option).forEach(([k, v]) => {
-                if(k === 'detailed' && v) renderDetailed = true
-            })
-        })
+		return res.status(400).send(
+			generateError('invalid_param(s)', {
+				invalid_params: invalidParams.invalidParams,
+			})
+		);
+	}
 
-        if(!renderDetailed){
-            const invalidKeys = []
-            invalidParams.invalidParams.forEach(k => {
-                Object.keys(k).forEach(key => invalidKeys.push(key))
-            })
-            return res.status(400).send(generateError('invalid_param(s)', {invalid_params: invalidKeys}))
-        }
-
-        return res.status(400).send(generateError('invalid_param(s)', {invalid_params: invalidParams.invalidParams}))
-    }
-
-    req.body = invalidParams?.transformed_keys;
-    next();
-
+	req.body = invalidParams?.transformed_keys;
+	next();
 }
