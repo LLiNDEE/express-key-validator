@@ -94,6 +94,10 @@ class Validator {
 		this.rules.push({ rule: 'regex', value: value });
 		return this;
 	}
+	custom(callback) {
+		this.rules.push({ rule: callback });
+		return this;
+	}
 	Route = {
 		Connect: function (route, schema) {
 			connected_keys.push({ [route]: schema });
@@ -138,6 +142,7 @@ function validateKeys(req, res, next) {
 	if (secureMode) {
 		const unknownParams = getUnknownParams(req.body, expected_keys);
 		if (!unknownParams.success) {
+
 			if (customTemplates?.unknown_params)
 				return res
 					.status(400)
@@ -147,7 +152,6 @@ function validateKeys(req, res, next) {
 							unknownParams.unknownParams
 						)
 					);
-
 			return res.status(400).send(
 				generateError('unknown_param(s)', {
 					unknown_params: unknownParams.unknownParams,
@@ -165,7 +169,6 @@ function validateKeys(req, res, next) {
 				customTemplates.missing_params,
 				missingParams.missingParams
 			);
-
 		const requiredParams = [];
 		let mp = missingParams.missingParams;
 		mp.forEach((param) => {

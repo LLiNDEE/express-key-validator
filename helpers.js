@@ -92,6 +92,18 @@ export const checkInvalidParams = (incomingKeys, expectedKeys) => {
 
 				if (ruleObject.rule === 'required') return;
 
+				if (typeof ruleObject.rule === 'function') {
+					if (!ruleObject.rule(incomingValue)) {
+						if (exist) return;
+						isValid = false;
+						exist = true;
+						return invalidParams.push({
+							[param]: { 'VALIDATION-ERROR': 'Value is not valid' },
+						});
+					}
+					return;
+				}
+
 				if (ruleObject?.value) {
 					if (!validateType[ruleObject.rule](incomingValue, ruleObject.value)) {
 						if (exist) return;
