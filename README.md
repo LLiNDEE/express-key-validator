@@ -51,6 +51,7 @@ Installation is done using **npm install command:**
 > negative() - Checks if the value is negative number
 > required() - Defines that the param is required and will throw error if the param is not found
 > regex( *regex* ) - Checks if the value matches the passed regex-expression
+> custom(*callback*) - Allows you to create a custom validation
 ```
 #### Example
 ```js
@@ -59,6 +60,19 @@ Installation is done using **npm install command:**
 >    email: new Validator().string().email()
 > })
 ```
+
+#### .custom()
+```js
+const userSchema = new Validator().Schema().Create({
+>   customCallback: new Validator().custom(v => {
+      if(typeof v === 'string') return true;
+      return false;
+    })
+})
+```
+The callback has to return either true or false. 
+- True indicating that the value is valid.
+- False indicating that the value is not valid.
 
 ## Options
 Alternative options that can be used.
